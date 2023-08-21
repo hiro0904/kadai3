@@ -1,22 +1,18 @@
 import math
-from janome.tokenizer import Tokenizer
 
 # サンプルの文章とクエリ
 documents = [
-    "これは最初の文章です。",
-    "この文章は2番目の文章です。",
-    "そしてこれが3番目の文章です。",
-    "これは最初の文章ですか？",
+    "This is the first document.",
+    "This document is the second document.",
+    "And this is the third one.",
+    "Is this the first document?",
 ]
 
-query = "これは最初のクエリです。"
+query = "This is the first query."
 
 # 文章とクエリをトークン化
 def tokenize(text):
-    t = Tokenizer()
-    tokens = t.tokenize(text)
-    # 小文字にして実行
-    return [token.surface.lower() for token in tokens]
+    return text.lower().split()
 
 
 # ドキュメント全体の単語を集めたリストを作成
@@ -25,31 +21,10 @@ for doc in documents + [query]:
     all_words.update(tokenize(doc))
 
 # 単語の出現回数を数える
-# 辞書を初期化
-word_counts = {}
-
-for word in all_words:
-    # 各単語の出現回数のリスト
-    word_count_list = []
-
-    for doc in documents:
-        # 文章内で単語が出現する回数をカウントしてリストに追加
-        word_count = doc.count(word)
-        word_count_list.append(word_count)
-
-    # 辞書に単語をキーとして、出現回数のリストを値として格納
-    word_counts[word] = word_count_list
-
+word_counts = {word: [doc.count(word) for doc in documents] for word in all_words}
 
 # 文章ごとの単語の出現回数を計算
-# クエリ内の単語の出現回数リスト
-query_counts = []
-# 全ての単語について処理を行う
-for word in all_words:
-    # クエリ内で単語が出現する回数をカウントしてリストに追加
-    word_count = query.count(word)
-    query_counts.append(word_count)
-
+query_counts = [query.count(word) for word in all_words]
 
 # Tf-idfを計算
 def tf_idf(word, doc_idx):
@@ -86,3 +61,4 @@ print("Query Tf-idf:", query_tfidf)
 print("Document Tf-idfs:")
 for doc_idx, doc_tfidf in enumerate(document_tfidfs):
     print(f"Document {doc_idx + 1}:", doc_tfidf)
+
