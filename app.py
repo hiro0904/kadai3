@@ -28,7 +28,9 @@ def scrap(load_url):
 def tokenize(text):
     t = Tokenizer()
     tokens = t.tokenize(text)
-    return [token.surface.lower() for token in tokens]
+    # トークンを小文字に変換してリストに格納
+    tokenized_text = [token.surface.lower() for token in tokens]
+    return tokenized_text
 
 
 # Tf-idfを計算
