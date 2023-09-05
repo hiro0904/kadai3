@@ -9,7 +9,7 @@ documents = [
     "これは最初の文章です。",
     "この文章は2番目の文章です。",
     "そしてこれが3番目の文章です。",
-    "これは最初の文章ですか？",
+    "ブーリアンモデル、Pythonで配列を結合する方法",
 ]
 
 query = "これは最初のクエリです。"
@@ -38,18 +38,25 @@ def calculate_tf_idf(word, doc_idx, word_counts):
 
     tf = word_counts[word][doc_idx] / sum(word_counts[word])
 
-    idf = math.log(
-        len(documents)
-        / (1 + sum(1 for doc in documents if word_counts[word][doc_idx] > 0))
-    )
+    doc_frequency = sum(1 for doc in documents if word_counts[word][doc_idx] > 0)
+    idf = math.log(len(documents) / (1 + doc_frequency))
+
+    # 小さな値を分母に追加してゼロ除算を避ける
+    epsilon = 1e-6
+    idf = idf if idf > epsilon else epsilon
+
     return tf * idf
 
 
 def cosine_similarity(v1, v2):
     dot_product = np.dot(v1, v2)
+    # print(f"ベクトルの内積{dot_product}")
     norm_v1 = np.linalg.norm(v1)
+    # print(f"ベクトル1のスカラー{norm_v1}")
     norm_v2 = np.linalg.norm(v2)
+    # print(f"ベクトル2のスカラー{norm_v2}")
     similarity = dot_product / (norm_v1 * norm_v2)
+    # print(f"類似度{similarity}\n")
     return similarity
 
 
@@ -57,14 +64,17 @@ def main():
     all_words = set()
     for doc in documents + [query]:
         all_words.update(tokenize(doc))
+        # print(f"doc:  {doc} \n")
 
     # 出現回数をカウント
     word_counts = {}
     for word in all_words:
+        # 文章内に何回出たかのリスト
         word_count_list = []
         for doc in documents:
             word_count = doc.count(word)
             word_count_list.append(word_count)
+            # print(f"ワード:{word}  ワードカウント:{word_count}\n")
         word_counts[word] = word_count_list
 
     # クエリ内の単語の出現回数リスト
@@ -98,6 +108,7 @@ def main():
     document_vectors = np.array(document_tfidfs)
 
     # 各ドキュメントとクエリの類似度を計算
+
     similarities = []
     for doc_vector in document_vectors:
         similarity = cosine_similarity(query_vector, doc_vector)
