@@ -9,9 +9,6 @@ from janome.analyzer import Analyzer
 from janome.tokenfilter import ExtractAttributeFilter
 from janome.charfilter import RegexReplaceCharFilter
 
-# TF-IDF
-from sklearn.feature_extraction.text import TfidfVectorizer
-
 # 描画モジュール
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -32,26 +29,6 @@ analyzer = Analyzer(
     token_filters=[POSKeepFilter(keep_pos), ExtractAttributeFilter("surface")]
 )
 # print(list(analyzer.analyze(scrap_text)))
-
-
-def analyze_with_tfidf(texts):
-    # TfidfVectorizerを初期化
-    vectorizer = TfidfVectorizer()
-
-    # テキストをTF-IDF行列に変換
-    tfidf_matrix = vectorizer.fit_transform(texts)
-
-    # 各単語の特徴名（単語） 特徴量を取得
-    feature_names = vectorizer.get_feature_names()
-
-    # 結果を表示
-    for i, text in enumerate(texts):
-        print(f"Text {i+1}:")
-        for j, word in enumerate(feature_names):
-            tfidf_score = tfidf_matrix[i, j]
-            if tfidf_score > 0:
-                print(f"  {word}: {tfidf_score}")
-
 
 # 指定した品詞だけ文からとってくる関数
 def get_words(string, keep_pos=None):
@@ -74,25 +51,42 @@ def get_words(string, keep_pos=None):
     return " ".join(list(tokens.analyze(string)))
 
 
+def write_text_to_file(text, filename):
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+            file.write(text)
+        print(f"テキストがファイル '{filename}' に正常に書き込まれました。")
+    except Exception as e:
+        print(f"エラー: ファイル '{filename}' への書き込み中に問題が発生しました。")
+        print(str(e))
+
+
 # get_words(scrap("https://news.yahoo.co.jp/categories/sports"), keep_pos=["名詞"])
 # 単純頻度重み付け
-get_words(scrap("https://news.yahoo.co.jp/categories/sports"), keep_pos=["名詞"])
+def main():
+    scrap_Y = get_words(scrap("https://news.yahoo.co.jp"), keep_pos=["名詞"])
+    scrap_Y_sports = get_words(
+        scrap("https://news.yahoo.co.jp/categories/sports"), keep_pos=["名詞"]
+    )
+    scrap_Y_it = get_words(
+        scrap("https://news.yahoo.co.jp/categories/it"), keep_pos=["名詞"]
+    )
+    scrap_Y_life = get_words(
+        scrap("https://news.yahoo.co.jp/categories/life"), keep_pos=["名詞"]
+    )
+    write_text_to_file(scrap_Y, "Y")
+    write_text_to_file(scrap_Y_sports, "Y-sport")
+    write_text_to_file(scrap_Y_it, "Y-it")
+    write_text_to_file(scrap_Y_life, "Y-life")
+    """
+    # wordクラウドを作成する
+    # 名詞を取り出してワードクラウドを作ろう
+    words = get_words(scrap("https://news.yahoo.co.jp/"), keep_pos=["名詞"])
+    # print(words)
+    count = Counter(words)
+    print(count)
+    """
 
 
-analyze_with_tfidf(
-    [
-        get_words(scrap("https://news.yahoo.co.jp/categories/sports"), keep_pos=["名詞"]),
-        get_words(scrap("https://news.yahoo.co.jp/categories/it"), keep_pos=["名詞"]),
-        get_words(scrap("https://news.yahoo.co.jp/categories/life"), keep_pos=["名詞"]),
-    ]
-)
-
-# wordクラウドを作成する
-# 名詞を取り出してワードクラウドを作ろう
-"""
-words = get_words(scrap("https://news.yahoo.co.jp/"), keep_pos=["名詞"])
-# print(words)
-count = Counter(words)
-print(count)
-"""
-
+if __name__ == "__main__":
+    main()
