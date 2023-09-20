@@ -5,8 +5,6 @@ from janome.tokenizer import Tokenizer
 import numpy as np
 import streamlit as st
 import plotly.graph_objs as go
-import pickle
-import os
 
 
 def read_text_file(filename):
@@ -119,73 +117,50 @@ def main():
 
     # for doc in range(len(documents)):
     #    st.write(documents[doc])
-    all_words = set()
+
     # 全てのワードの集合を作る
-    file_name = "all_words.pkl"
-    if os.path.exists(file_name):
-        # all_wordがある時
-        with open(file_name, "rb") as file:
-            all_words = pickle.load(file)
-            st.write("all wordを読み込みます")
-    else:
-        # all_wordが無い時
-        for doc in documents:
-            all_words.update(tokenize(doc))
-        st.header("all wordは")
-        st.write(all_words)
-        # all_wordsを保存する
-        with open("all_words.pkl", "wb") as file:
-            pickle.dump(all_words, file)
+    all_words = set()
+    for doc in documents + [query]:
+        all_words.update(tokenize(doc))
+    # st.header("all wordは")
+    # st.write(all_words)
 
-    array_tf_idf_doc = []
-    file_name_tfi_df = "array_tf_idf_doc.pkl"  # ファイル名を指定してください
-    if os.path.exists(file_name_tfi_df):
-        # array_tf_idfがある時
-        st.write("tf-idfを読み込みます。")
-        with open(file_name_tfi_df, "rb") as file:
-            array_tf_idf_doc = pickle.load(file)
-    else:
-        # tf分解
-        array_tf_doc = []
-        for i in range(len(documents)):
-            array_tf_doc.append(calculate_tf(documents[i], all_words))
-
-        # docのtfを集めた集合を作成
-        # st.write(array_tf_doc)
-
-        # 文章を比較してidfを作成する。
-        # st.write(len(all_words))
-        array_idf_doc = []
-
-        for term in range(len(all_words)):
-            instant_var = 0
-            for i in range(len(array_tf_doc)):
-                if array_tf_doc[i][term] != 0:
-                    instant_var += 1
-            if instant_var == 0:
-                # 現れない時はidfは無限になるが、tfが0なので
-                array_idf_doc.append(0)
-            elif instant_var != 0:
-                array_idf_doc.append(len(array_tf_doc) / instant_var)
-        # 後でlogにしても良いよ
-        # st.write(array_idf_doc)
-        # st.write(len(array_idf_doc))
-
-        # tf idfを作成 doc0
-        st.header("tf idfを計算")
-        array_tf_idf_doc = []
-        for doc in range(len(documents)):
-            # print(f"{doc}番目の文章")
-            np_array_tf = np.array(array_tf_doc[doc])
-            np_array_idf = np.array(array_idf_doc)
-            # print(np_array_tf * np_array_idf)
-            array_tf_idf_doc.append(np_array_tf * np_array_idf)
-        st.write(array_tf_idf_doc)
-        with open("array_tf_idf_doc.pkl", "wb") as file:
-            pickle.dump(array_tf_idf_doc, file)
-
-    # ここから新規にやること
+    # tf分解
     tf_query = calculate_tf(query, all_words)
+    array_tf_doc = []
+    for i in range(len(documents)):
+        array_tf_doc.append(calculate_tf(documents[i], all_words))
+    # docのtfを集めた集合を作成
+    # st.write(array_tf_doc)
+
+    # 文章を比較してidfを作成する。
+    # st.write(len(all_words))
+    array_idf_doc = []
+
+    for term in range(len(all_words)):
+        instant_var = 0
+        for i in range(len(array_tf_doc)):
+            if array_tf_doc[i][term] != 0:
+                instant_var += 1
+        if instant_var == 0:
+            # 現れない時はidfは無限になるが、tfが0なので
+            array_idf_doc.append(0)
+        elif instant_var != 0:
+            array_idf_doc.append(len(array_tf_doc) / instant_var)
+    # 後でlogにしても良いよ
+    # st.write(array_idf_doc)
+    # st.write(len(array_idf_doc))
+
+    # tf idfを作成 doc0
+    # st.header("tf idfを計算")
+    array_tf_idf_doc = []
+    for doc in range(len(documents)):
+        # print(f"{doc}番目の文章")
+        np_array_tf = np.array(array_tf_doc[doc])
+        np_array_idf = np.array(array_idf_doc)
+        # print(np_array_tf * np_array_idf)
+        array_tf_idf_doc.append(np_array_tf * np_array_idf)
+    # st.write(array_tf_idf_doc)
     st.header("文章との類似度")
     # query と  tf_idfの類似度を考える
     np_query_tf = np.array(tf_query)
