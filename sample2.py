@@ -59,10 +59,10 @@ def cosine_similarity(v1, v2):
 
 
 def main():
-    scrap_Y = read_text_file("Y")
-    scrap_Y_it = read_text_file("Y-it")
-    scrap_Y_life = read_text_file("Y-life")
-    scrap_Y_sports = read_text_file("Y-sport")
+    scrap_Y = read_text_file("import-data/Y")
+    scrap_Y_it = read_text_file("import-data/Y-it")
+    scrap_Y_life = read_text_file("import-data/Y-life")
+    scrap_Y_sports = read_text_file("import-data/Y-sport")
 
     # サンプルの文章とクエリ
     documents = [
@@ -78,7 +78,7 @@ def main():
         print(documents[doc])
     # 全てのワードの集合を作る
     all_words = set()
-    for doc in documents + [query]:
+    for doc in documents:
         all_words.update(tokenize(doc))
     print("all wordは")
     print(all_words)

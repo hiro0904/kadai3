@@ -67,7 +67,7 @@ def main():
 
     # 全てのワードの集合を作る
     all_words = set()
-    for doc in documents + [query]:
+    for doc in documents:
         all_words.update(tokenize(doc))
     print("all wordは")
     print(all_words)

@@ -74,10 +74,21 @@ def main():
     scrap_Y_life = get_words(
         scrap("https://news.yahoo.co.jp/categories/life"), keep_pos=["名詞"]
     )
-    write_text_to_file(scrap_Y, "Y")
-    write_text_to_file(scrap_Y_sports, "Y-sport")
-    write_text_to_file(scrap_Y_it, "Y-it")
-    write_text_to_file(scrap_Y_life, "Y-life")
+    scrap_economy = get_words(scrap("https://www.bloomberg.co.jp/"), keep_pos=["名詞"])
+    scrap_history = get_words(
+        scrap(
+            "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC%E3%81%AE%E6%AD%B4%E5%8F%B2"
+        ),
+        keep_pos=["名詞"],
+    )
+
+    write_text_to_file(scrap_Y, "import-data/Y")
+    write_text_to_file(scrap_Y_sports, "import-data/Y-sport")
+    write_text_to_file(scrap_Y_it, "import-data/Y-it")
+    write_text_to_file(scrap_Y_life, "import-data/Y-life")
+    write_text_to_file(scrap_economy, "import-data/bloomberg")
+    write_text_to_file(scrap_history, "import-data/japan-history")
+
     """
     # wordクラウドを作成する
     # 名詞を取り出してワードクラウドを作ろう

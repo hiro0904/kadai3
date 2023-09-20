@@ -83,12 +83,10 @@ def main():
     scrap_python_print = scrap(
         "https://docs.python.org/ja/3.7/tutorial/inputoutput.html"
     )
-    scrap_Y_life = read_text_file("Y-life")
-    scrap_Y_sports = read_text_file("Y-sport")
-    scrap_economy = scrap("https://www.bloomberg.co.jp/")
-    scrap_history = scrap(
-        "https://ja.wikipedia.org/wiki/%E6%97%A5%E6%9C%AC%E3%81%AE%E6%AD%B4%E5%8F%B2"
-    )
+    scrap_Y_life = read_text_file("import-data/Y-life")
+    scrap_Y_sports = read_text_file("import-data/Y-sport")
+    scrap_economy = read_text_file("import-data/bloomberg")
+    scrap_history = read_text_file("import-data/japan-history")
 
     # サンプルの文章とクエリ
     documents = [
@@ -110,18 +108,15 @@ def main():
     st.header("クエリ")
     st.write(query)
     st.header("ドキュメント")
-    st.subheader("文章1 : Pythonチュートリアル")
-    st.subheader("文章2 : Yahoo lifeカテゴリ ")
-    st.subheader("文書3 : Yahoo sportカテゴリ")
-    st.subheader("文章4 : bloomberg 経済誌")
-    st.subheader("文章5 日本の歴史 - wikipedia")
+    for doc in document_title:
+        st.header(doc)
     st.divider()
 
     # for doc in range(len(documents)):
     #    st.write(documents[doc])
     all_words = set()
     # 全てのワードの集合を作る
-    file_name = "all_words.pkl"
+    file_name = "import-data/all_words.pkl"
     if os.path.exists(file_name):
         # all_wordがある時
         with open(file_name, "rb") as file:
@@ -134,11 +129,12 @@ def main():
         st.header("all wordは")
         st.write(all_words)
         # all_wordsを保存する
-        with open("all_words.pkl", "wb") as file:
-            pickle.dump(all_words, file)
+        # 上手く行かないので保存をコメントアウト
+        # with open(file_name, "wb") as file:
+        # pickle.dump(all_words, file)
 
     array_tf_idf_doc = []
-    file_name_tfi_df = "array_tf_idf_doc.pkl"  # ファイル名を指定してください
+    file_name_tfi_df = "import-data/array_tf_idf_doc.pkl"  # ファイル名を指定してください
     if os.path.exists(file_name_tfi_df):
         # array_tf_idfがある時
         st.write("tf-idfを読み込みます。")
@@ -181,8 +177,9 @@ def main():
             # print(np_array_tf * np_array_idf)
             array_tf_idf_doc.append(np_array_tf * np_array_idf)
         st.write(array_tf_idf_doc)
-        with open("array_tf_idf_doc.pkl", "wb") as file:
-            pickle.dump(array_tf_idf_doc, file)
+        # 上手く行かないので保存をコメントアウト
+        # with open(file_name_tfi_df, "wb") as file:
+        # pickle.dump(array_tf_idf_doc, file)
 
     # ここから新規にやること
     tf_query = calculate_tf(query, all_words)
